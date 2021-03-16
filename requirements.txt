@@ -1,0 +1,10 @@
+requests~=2.25.1
+beautifulsoup4~=4.9.3
+mysql-connector-python~=8.0.22
+nltk~=3.5
+pymystem3~=0.2.0
+sklearn~=0.0
+scikit-learn~=0.24.0
+textblob~=0.15.3
+transliterate~=1.10.2
+PyMySQL~=1.0.2

@@ -102,3 +102,8 @@ dist
 
 # TernJS port file
 .tern-port
+/src/sentiment_determinator/training.1600000.processed.noemoticon.csv
+/src/sentiment_determinator/tesst.csv
+/src/sentiment_determinator/sample.csv
+/src/sentiment_determinator/doc_comment_summary.xlsx
+/int/

@@ -64,7 +64,7 @@ def prepare(folder: str) -> VoteClassifier:
     return voted_classifier
 
 
-def sentiment(text: str, folder_with_pickle: str, keys: List[str]) -> tuple:
+def sentiment(text: str, folder_with_pickle: str) -> tuple:
     word_features5k_f = open(f"{folder_with_pickle}/word_features5k.pickle", "rb")
     word_features = pickle.load(word_features5k_f)
     word_features5k_f.close()
@@ -79,8 +79,11 @@ def sentiment(text: str, folder_with_pickle: str, keys: List[str]) -> tuple:
 
     voted_classifier = prepare(folder_with_pickle)
     temp_text = text
-    # print(text)
-    # temp_text = scrapper(text, keys)
     feats = find_features(temp_text)
     return voted_classifier.classify(feats), voted_classifier.confidence(feats)
 
+
+print(sentiment("avoid dump, carpets ripped doors kicked poorly repaired disgustingly dirty smelly carpets yeah right microwave bookshelf, not stay out-dated brochure shows pics world not dump",
+
+
+                'algos'))

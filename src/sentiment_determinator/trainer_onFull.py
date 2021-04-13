@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import csv
+import os
 import pickle
 import random
-from string import punctuation
+from string import punctuation, digits
 import nltk
+import numpy as np
 from nltk.classify.scikitlearn import SklearnClassifier
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -13,75 +15,109 @@ from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.naive_bayes import MultinomialNB, ComplementNB
 from sklearn.svm import LinearSVC
 from sklearn.tree import ExtraTreeClassifier
-from textblob import TextBlob
-from transliterate import translit
 
-nltk.download('punkt')
-nltk.download("stopwords")
-nltk.download('averaged_perceptron_tagger')
+nltk.download('punkt', quiet=True)
+nltk.download("stopwords", quiet=True)
+nltk.download('averaged_perceptron_tagger', quiet=True)
 
 mystem = Mystem()
 eng_stopwords = stopwords.words("english")
-min_acc = 90
 
-# move this up heres
 all_words = []
 documents = []
 
-#  j is adject, r is adverb, and v is verb
 # allowed_word_types = ["J","R","V"]
-allowed_word_types = ['A', 'V', 'S']
+allowed_word_types = ('JJ', 'JJS', 'RB', 'VB')
+
+
+def preprocess_text(spam):
+    lol = lambda lst, sz: [lst[i:i + sz] for i in range(0, len(lst), sz)]
+    txtpart = lol(spam, 1000)
+    res = []  # обработанный текст
+
+    for txtp in txtpart:
+        alltexts = ' '.join([txt + ' br ' for txt in txtp])
+
+        words = mystem.lemmatize(alltexts)
+        tokens = [token for token in words if token
+                  not in eng_stopwords
+                  and token != " "
+                  and token.strip() not in punctuation
+                  and token.strip() not in digits]
+        doc = []
+        for txt in tokens:
+            if txt != '\n' and txt.strip() != '':
+                if txt == 'br':
+                    res.append(doc)
+                    doc = []
+                else:
+                    doc.append(txt)
+    res = [' '.join(i) for i in res]
+    """список обработанных отзывов"""
+    return res
+
+
+quantity = 1200
+with open(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', r'..\resources\reviews.csv')), 'r', newline='',
+          encoding='latin-1') as f:
+    spam = list(csv.reader(f, delimiter=','))[1:]
+    spam = np.array(spam)
+    preprocessed_revs = preprocess_text(spam[:quantity, 0])
+
 p, n, nt = 0, 0, 0
+try:
+    """Join for group of 1000 for faster lematize"""
+    stream = list(zip(preprocessed_revs, spam[:quantity, 1]))
+    for i, row in enumerate(stream):
+        # tokenize our text data
+        if row[1] == '1':
+            documents.append((row[0], "neg"))
+            words = nltk.word_tokenize(row[0], language='english')
+            pos = tuple(nltk.pos_tag(words, lang='eng'))
 
+            for w in pos:
+                if w[1] in allowed_word_types:
+                    all_words.append(w[0].lower())
+                    n += 1
 
-def preprocess_text(text):
-    tokens = mystem.lemmatize(text.lower())
-    tokens = [token for token in tokens if token
-              not in eng_stopwords
-              and token != " "
-              and token.strip() not in punctuation]
-    text = " ".join(tokens)
-    return text
+        elif row[1] == '2':
+            documents.append((row[0], "pos"))
+            words = nltk.word_tokenize(row[0], language='english')
+            pos = tuple(nltk.pos_tag(words, lang='eng'))
 
+            for w in pos:
+                if w[1] in allowed_word_types:
+                    all_words.append(w[0].lower())
+                    p += 1
 
-with open('training.1600000.processed.noemoticon.csv', 'r', newline='', encoding='latin-1') as f:
-    spam = csv.reader(f, delimiter=',')
-    try:
-        for i, row in enumerate(spam):
-            print(row[0], row[5])
-            row[5] = preprocess_text(row[5])
+        elif row[1] == '3':
+            documents.append((row[0], "ntr"))
+            words = nltk.word_tokenize(row[0], language='english')
+            pos = tuple(nltk.pos_tag(words, lang='eng'))
 
-            if row[0] == '0':
-                documents.append((row[5], "neg"))
-                words = nltk.word_tokenize(row[5], language='english')
-                pos = nltk.pos_tag(words, lang='eng')
-                for w in pos:
-                    if w[1][0] in allowed_word_types:
-                        all_words.append(w[0].lower())
-                        n += 1
+            for w in pos:
+                if w[1] in allowed_word_types:
+                    all_words.append(w[0].lower())
+                    nt += 1
 
-            elif row[0] == '4':
-                documents.append((row[5], "pos"))
-                words = nltk.word_tokenize(row[5], language='english')
-                pos = nltk.pos_tag(words, lang='eng')
-                for w in pos:
-                    if w[1][0] in allowed_word_types:
-                        all_words.append(w[0].lower())
-                        p += 1
+except Exception as e:
+    print(i, e)
 
-    except Exception as e:
-        print(i, e)
-print(p, n)
+print(n, p, nt)  # оотношение между негативными позитивными и нейтральными отзывами
 
 save_documents = open("algos/documents.pickle", "wb")
-pickle.dump(documents, save_documents)
+pickle.dump(documents, save_documents,protocol=pickle.HIGHEST_PROTOCOL)
 save_documents.close()
-all_words = nltk.FreqDist(all_words)
+del save_documents
 
-word_features = list(all_words.keys())[:int(len(all_words)*0.5)]
+all_words = nltk.FreqDist(all_words)
+documents = tuple(documents)
+word_features = tuple(all_words.keys())[:int(len(all_words) * 0.5)]
+
+del all_words
 
 save_word_features = open("algos/word_features5k.pickle", "wb")
-pickle.dump(word_features, save_word_features)
+pickle.dump(word_features, save_word_features,protocol=pickle.HIGHEST_PROTOCOL)
 save_word_features.close()
 
 
@@ -95,26 +131,27 @@ def find_features(document):
 
 
 featuresets = [(find_features(rev), category) for (rev, category) in documents]
+del documents
+del word_features
 
 random.shuffle(featuresets)
 print(len(featuresets))
 
-training_set = featuresets[:int(len(featuresets)*0.8)]
-print(training_set)
-testing_set = featuresets[int(len(featuresets)*0.8):]
-print(testing_set)
+training_set = featuresets[:int(len(featuresets) * 0.8)]
+testing_set = featuresets[int(len(featuresets) * 0.8):]
+
 classifier = nltk.NaiveBayesClassifier.train(training_set)
 classifier.show_most_informative_features(15)
-
+del classifier
 
 MNB_classifier = SklearnClassifier(MultinomialNB())
 MNB_classifier.train(training_set)
 print("MNB_classifier accuracy percent:", (nltk.classify.accuracy(MNB_classifier, testing_set)) * 100)
 
 save_classifier = open("algos/MNB_classifier5k.pickle", "wb")
-pickle.dump(MNB_classifier, save_classifier)
+pickle.dump(MNB_classifier, save_classifier,protocol=pickle.HIGHEST_PROTOCOL)
 save_classifier.close()
-
+del MNB_classifier
 
 #################################################
 ComplementNB_classifier = SklearnClassifier(ComplementNB())
@@ -122,46 +159,47 @@ ComplementNB_classifier.train(training_set)
 
 print("ComplementNB accuracy percent:", (nltk.classify.accuracy(ComplementNB_classifier, testing_set)) * 100)
 save_classifier = open("algos/ComplementNB_classifier.pickle", "wb")
-pickle.dump(ComplementNB_classifier, save_classifier)
+pickle.dump(ComplementNB_classifier, save_classifier,protocol=pickle.HIGHEST_PROTOCOL)
 save_classifier.close()
-
+del ComplementNB_classifier
 
 ################################################
-LogisticRegression_classifier = SklearnClassifier(LogisticRegression(max_iter=1000, warm_start=True))
+LogisticRegression_classifier = SklearnClassifier(LogisticRegression(max_iter=10000, warm_start=True))
 LogisticRegression_classifier.train(training_set)
 
-print("LogisticRegression_classifier accuracy percent:", (nltk.classify.accuracy(LogisticRegression_classifier, testing_set)) * 100)
+print("LogisticRegression_classifier accuracy percent:",
+      (nltk.classify.accuracy(LogisticRegression_classifier, testing_set)) * 100)
 save_classifier = open("algos/LogisticRegression_classifier5k.pickle", "wb")
-pickle.dump(LogisticRegression_classifier, save_classifier)
+pickle.dump(LogisticRegression_classifier, save_classifier,protocol=pickle.HIGHEST_PROTOCOL)
 save_classifier.close()
-
+del LogisticRegression_classifier
 
 ################################################
-LinearSVC_classifier = SklearnClassifier(LinearSVC(max_iter=1000))
+LinearSVC_classifier = SklearnClassifier(LinearSVC(max_iter=10000))
 LinearSVC_classifier.train(training_set)
 
 print("LinearSVC_classifier accuracy percent:", (nltk.classify.accuracy(LinearSVC_classifier, testing_set)) * 100)
 save_classifier = open("algos/LinearSVC_classifier5k.pickle", "wb")
-pickle.dump(LinearSVC_classifier, save_classifier)
+pickle.dump(LinearSVC_classifier, save_classifier,protocol=pickle.HIGHEST_PROTOCOL)
 save_classifier.close()
+del LinearSVC_classifier
 
 ###############################################
 SGDC_classifier = SklearnClassifier(SGDClassifier(max_iter=1000, warm_start=True))
 SGDC_classifier.train(training_set)
 
-
 print("SGDClassifier accuracy percent:", nltk.classify.accuracy(SGDC_classifier, testing_set) * 100)
 save_classifier = open("algos/SGDC_classifier5k.pickle", "wb")
-pickle.dump(SGDC_classifier, save_classifier)
+pickle.dump(SGDC_classifier, save_classifier,protocol=pickle.HIGHEST_PROTOCOL)
 save_classifier.close()
+del SGDC_classifier
 
 ###############################################
 ExtraTreeClassifier = SklearnClassifier(ExtraTreeClassifier())
 ExtraTreeClassifier.train(training_set)
 
-
 print("ExtraTreeClassifier accuracy percent:", nltk.classify.accuracy(ExtraTreeClassifier, testing_set) * 100)
 save_classifier = open("algos/ExtraTreeClassifier.pickle", "wb")
-pickle.dump(ExtraTreeClassifier, save_classifier)
+pickle.dump(ExtraTreeClassifier, save_classifier,protocol=pickle.HIGHEST_PROTOCOL)
 save_classifier.close()
-
+del ExtraTreeClassifier

@@ -34,7 +34,9 @@
 * Подати в модуль sentiment текст для аналізу
 * Отримаємо відповідь у форматі настрій | точність
 ## Example
+![example](docs/res2.png)
 
+![example](docs/res1.png)
 
 ## Контактна інформація
 * Телеграм - https://t.me/Kep_Alex

@@ -24,7 +24,7 @@
 
 
  ## Код UNIT-тесту:
-  
+ ```python
       class MyTestCase(unittest.TestCase):
   
       def test_neutral(self):
@@ -37,4 +37,5 @@
           self.assertEqual('neg', test_negative())
 
       if __name__ == '__main__':
-          unittest.main()
+          unittest.main() 
+```

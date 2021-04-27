@@ -1,7 +1,7 @@
 ![logo](docs/logo.png)
 
 # Raspoznovalka Inc. - sentiment determinator
-![version](https://badgen.net/badge/version/0.1.1/green)
+![version](https://badgen.net/badge/version/0.1.2/green)
 
 ## Налаштування проекту
 Для початку потрібно:

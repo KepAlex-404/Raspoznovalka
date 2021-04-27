@@ -102,8 +102,16 @@ dist
 
 # TernJS port file
 .tern-port
-/src/sentiment_determinator/training.1600000.processed.noemoticon.csv
-/src/sentiment_determinator/tesst.csv
-/src/sentiment_determinator/sample.csv
-/src/sentiment_determinator/doc_comment_summary.xlsx
+/src/training.1600000.processed.noemoticon.csv
+/src/tesst.csv
+/src/sample.csv
+/src/doc_comment_summary.xlsx
 /int/
+/src/tripadvisor_hotel_reviews.csv
+/src/test.py
+/src/doc_comment_summary.xlsx
+/src/sample.csv
+/src/tesst.csv
+/src/test.py
+/src/training.1600000.processed.noemoticon.csv
+/src/tripadvisor_hotel_reviews.csv

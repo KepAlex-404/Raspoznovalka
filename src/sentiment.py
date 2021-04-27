@@ -5,14 +5,16 @@ from abc import ABC
 from statistics import mode
 from nltk.classify import ClassifierI
 from nltk.tokenize import word_tokenize
-from typing import List
 
 
 class VoteClassifier(ClassifierI, ABC):
+    """клас що об'єднує в собі результати роботи усіх наявних моделей"""
+
     def __init__(self, *classifiers):
         self._classifiers = classifiers
 
     def classify(self, features):
+        """метод розрахунку результату"""
         votes = []
         for c in self._classifiers:
             v = c.classify(features)
@@ -20,6 +22,7 @@ class VoteClassifier(ClassifierI, ABC):
         return mode(votes)
 
     def confidence(self, features):
+        """метод розрахунки точності результату"""
         votes = []
         for c in self._classifiers:
             v = c.classify(features)
@@ -30,6 +33,8 @@ class VoteClassifier(ClassifierI, ABC):
 
 
 def prepare(folder: str) -> VoteClassifier:
+    """завантажити наявні моделі"""
+
     open_file = open(f"{folder}/ExtraTreeClassifier.pickle", "rb")
     ExtraTreeClassifier = pickle.load(open_file)
     open_file.close()
@@ -65,6 +70,7 @@ def prepare(folder: str) -> VoteClassifier:
 
 
 def sentiment(text: str, folder_with_pickle: str) -> tuple:
+    """повертає результат визначення тональності та впевненість"""
     word_features5k_f = open(f"{folder_with_pickle}/word_features5k.pickle", "rb")
     word_features = pickle.load(word_features5k_f)
     word_features5k_f.close()
@@ -81,9 +87,3 @@ def sentiment(text: str, folder_with_pickle: str) -> tuple:
     temp_text = text
     feats = find_features(temp_text)
     return voted_classifier.classify(feats), voted_classifier.confidence(feats)
-
-
-print(sentiment("avoid dump, carpets ripped doors kicked poorly repaired disgustingly dirty smelly carpets yeah right microwave bookshelf, not stay out-dated brochure shows pics world not dump",
-
-
-                'algos'))

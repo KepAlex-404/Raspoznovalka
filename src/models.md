@@ -11,7 +11,7 @@
 підрахунку ознак. 
 
 Однак на практиці дробовий підрахунок також може спрацювати.
-
+```python
     import numpy as np
     rng = np.random.RandomState(1)
     X = rng.randint(5, size=(6, 100))
@@ -22,14 +22,14 @@
     MultinomialNB()
     print(clf.predict(X[2:3]))
     >>> 3
-
+```
 ## ComplementNB
 >Детальніше [тут](https://scikit-learn.org/stable/modules/generated/sklearn.naive_bayes.ComplementNB.html)
 
 Класифікатор Наївного Байєса "Доповнення" був розроблений для виправлення 
 "суворих припущень", зроблених стандартним багаточленовим класифікатором Наїв Байєса. 
 Це особливо підходить для незбалансованих наборів даних.
-
+```python
     import numpy as np
     rng = np.random.RandomState(1)
     X = rng.randint(5, size=(6, 100))
@@ -40,7 +40,7 @@
     ComplementNB()
     print(clf.predict(X[2:3]))
     >>> 3
-
+```
 ## LogisticRegression
 >Детальніше [тут](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html)
 
@@ -48,7 +48,7 @@
 Логістична регресія також відома в літературі як класифікація максимальної ентропії (MaxEnt) або 
 лінійно-лінійний класифікатор. У цій моделі імовірності, що описують можливі результати одного випробування, 
 моделюються за допомогою логістичної функції.
-
+```python
     >>> from sklearn.datasets import load_iris
     >>> from sklearn.linear_model import LogisticRegression
     >>> X, y = load_iris(return_X_y=True)
@@ -60,7 +60,7 @@
            [9.7...e-01, 2.8...e-02, ...e-08]])
     >>> clf.score(X, y)
     0.97...
-
+```
 ## LinearSVC
 >Детальніше [тут](https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html)
 

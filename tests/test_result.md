@@ -19,11 +19,11 @@
         average facilities need overhaul feel dated, service ok. reason stay good rate need central location    
 
 
-+ ##Результати тестів:
+ ## Результати тестів:
 ![example](../docs/test_run.png)
 
 
-+ ##Код UNIT-тесту:
+ ## Код UNIT-тесту:
   
       class MyTestCase(unittest.TestCase):
   

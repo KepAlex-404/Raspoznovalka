@@ -44,6 +44,7 @@
     У цій стадій видаляються всі html теги, пунктуаций, символи.
     Дана операція здійснюється за допомогою регулярних виразів.
 
+
             def complex_formatter(text: Set[str]) -> str:
                 text = sorted(text)
                 temp = ' '.join(text) \
@@ -61,6 +62,7 @@
   
     Стоп слова видаляються за допомогою пакета Python Natural Language Toolkit (NLTK), крім того
     модифікуючи кожне слова в початкову форму
+  
   
         for i, row in enumerate(stream):
         """розподіл по тональності контенту з датасету"""
@@ -112,9 +114,11 @@
   фіксований довжини (довжина вектора задається вручну), яка зустрічається в датасета.
   </p>
 
-    def preprocess_text(spam):
-            """попереднє оброблення тексту"""
+
+        def preprocess_text(spam):
+                """попереднє оброблення тексту"""
         
+    
             lol = lambda lst, sz: [lst[i:i + sz] for i in range(0, len(lst), sz)]
             txtpart = lol(spam, 1000)
             res = []  # обработанный текст
@@ -153,6 +157,7 @@
 Далі алгоритми все беруть на себе, тренуються на навчальній вибірці перевіряє результат навчання на тестовій та 
 зберігає всі необхідні дані.
 
+
     """розбиття на тестовий та тренувальний набір"""
     training_set = featuresets[:int(len(featuresets) * 0.8)]
     testing_set = featuresets[int(len(featuresets) * 0.8):]
@@ -175,6 +180,7 @@
     В результаті навчання ми маємо такий набір моделей 
 >Детальніше про кожну з них [тут](../src/models.md)
 
+
     voted_classifier = VoteClassifier(
         ExtraTreeClassifier,
         LinearSVC_classifier,
@@ -184,6 +190,7 @@
         SGDC_classifier)
 
 Ці моделі ми об'єднуємо в єдиний класифікатор який згодом і використовуємо на практиці
+
 
     class VoteClassifier(ClassifierI, ABC):
         """клас що об'єднує в собі результати роботи усіх наявних моделей"""

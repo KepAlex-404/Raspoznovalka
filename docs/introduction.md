@@ -225,5 +225,7 @@ class VoteClassifier(ClassifierI, ABC):
 
 ### Контактна інформація 
 https://t.me/Kep_Alex
+
 https://github.com/KepAlex-404/Raspoznovalka
+
 https://www.youtube.com/watch?v=CbthgV4c23Q&t=2s&ab_channel=KepAlex
